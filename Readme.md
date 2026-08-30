@@ -142,4 +142,4 @@ December 2012 was forecasted at $293.75M (95% CI: $253.6M–$333.9M) via Excel, 
 
 ## Tools Used
 
-SQL (PostgreSQL) · Excel (FORECAST.ETS, DAX-style confidence intervals) · Power BI (DAX measures, forecast visuals, dashboard design)
+SQL (PostgreSQL) · Excel ( FORECAST.ETS(), FORECAST.ETS.CONFINT() ) · Power BI (DAX measures, forecast visuals, dashboard design)
