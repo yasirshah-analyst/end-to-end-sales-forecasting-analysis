@@ -49,7 +49,7 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 
 ## Dashboard
 
-![Dashboard Screenshot](dashboard\images\dashboard_screenshot.png)
+![Dashboard Screenshot](dashboard/images/dashboard_screenshot.png)
 
 *(Add your dashboard screenshot to `images/dashboard_screenshot.png` — this is usually the first thing people look at, so it's worth having front and center.)*
 
