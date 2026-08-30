@@ -21,26 +21,33 @@ This question guided every stage of the project — from the SQL analysis used t
 
 **Columns**: Store, Date, Weekly_Sales, Holiday_Flag, Temperature, Fuel_Price, CPI, Unemployment
 
-The raw CSV is not included in this repository per standard practice for third-party datasets — download it directly from the Kaggle link above to reproduce this project. Data was loaded into a PostgreSQL database for cleaning, validation, and analysis.
-
 ---
 
 ## Repository Structure
 
 ```
+end-to-end-sales-forecasting-analysis/
+│
 ├── README.md
+│
+├── dataset/
+│   └── Walmart.csv
+│
 ├── sql/
-│   ├── 01_data_cleaning.sql
-│   ├── 02_monthly_trend.sql
-│   ├── 03_holiday_vs_nonholiday.sql
-│   ├── 04_holiday_breakdown_by_date.sql
-│   └── 05_year_over_year.sql
+│   ├── Walmart_Sales_Forecast_Trend_Seasonality_and_Holiday_Impact.sql
+│   └── outputs/
+│       ├── monthly_trend.csv
+│       ├── holiday_vs_nonholiday.csv
+│       ├── holiday_breakdown_by_date.csv
+│       └── year_over_year.csv
+│
 ├── excel/
-│   └── walmart_forecast.xlsx        (FORECAST.ETS, confidence intervals, backtest)
+│   └── Walmart_Forecast.xlsx
+│
 ├── dashboard/
-│   └── walmart_sales_dashboard.pbix
-└── images/
-    └── dashboard_screenshot.png
+│   ├── walmart_sales_dashboard.pbix
+│   └── images/
+│       └── dashboard_screenshot.png
 ```
 
 Full SQL scripts and the Excel/Power BI files are included above for anyone who wants to verify or extend the analysis. The sections below summarize the approach and results; they're not a full step-by-step log.
@@ -50,8 +57,6 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 ## Dashboard
 
 ![Dashboard Screenshot](dashboard/images/dashboard_screenshot.png)
-
-*(Add your dashboard screenshot to `images/dashboard_screenshot.png` — this is usually the first thing people look at, so it's worth having front and center.)*
 
 ---
 
