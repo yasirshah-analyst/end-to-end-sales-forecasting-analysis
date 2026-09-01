@@ -79,7 +79,7 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 
  **View Excel File**
 
-[Excel Forcast](excel\walmart_forecast.xlsx)
+[Excel Forcast](excel/walmart_forecast.xlsx)
 
 - **Power BI**: built-in forecast visual (Analytics pane), same 3-month horizon and seasonality setting, for cross-validation against the Excel result.
 
