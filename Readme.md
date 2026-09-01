@@ -75,11 +75,7 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 - Identified top 5 and bottom 5 performing stores by average weekly sales.
 
 ### 3. Forecasting (Two independent methods, for comparison)
-- **Excel**: `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval.
-
- **View Excel File**
-
-[Excel Forcast](excel/walmart_forecast.xlsx)
+- **Excel**: `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval
 
 - **Power BI**: built-in forecast visual (Analytics pane), same 3-month horizon and seasonality setting, for cross-validation against the Excel result.
 
