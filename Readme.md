@@ -1,57 +1,23 @@
-# Walmart Sales Forecast: Trend, Seasonality & Holiday Impact
-
-A sales forecasting project built with SQL (PostgreSQL), Excel, and Power BI, examining historical Walmart weekly sales data to forecast near-term revenue and identify the key drivers behind seasonal fluctuations.
-
+# Forecasting a $293M December Peak: Isolating the Real Driver Behind Walmart's Holiday Sales Surge
+ 
+**A sales forecasting project using SQL, Excel, and Power BI to examine historical Walmart weekly sales, forecast near-term revenue, and identify what actually drives the holiday spike**
+ 
+*Tools: SQL (PostgreSQL) | Excel | Power BI | DAX*
+ 
 ---
-
-## Business Question
-
-> What will total company-wide weekly sales look like over the next 3 months, and how much of that pattern is driven by holiday periods?
-
-This question guided every stage of the project — from the SQL analysis used to understand historical patterns, to the choice of forecasting method, to the KPIs featured on the final dashboard.
-
----
-
-## Data Source & License
-
-**Dataset**: Walmart Weekly Sales (2010–2012)
-**Source**: [Kaggle — Walmart Dataset](https://www.kaggle.com/datasets/yasserh/walmart-dataset)
-**License**: CC0: Public Domain
-**Size**: 6,435 rows, 45 stores, weekly sales from February 2010 to November 2012 (~2.7 years)
-
-**Columns**: Store, Date, Weekly_Sales, Holiday_Flag, Temperature, Fuel_Price, CPI, Unemployment
-
----
-
-## Repository Structure
-
-```
-end-to-end-sales-forecasting-analysis/
-│
-├── README.md
-│
-├── dataset/
-│   └── Walmart.csv
-│
-├── sql/
-│   ├── Walmart_Sales_Forecast_Trend_Seasonality_and_Holiday_Impact.sql
-│   └── outputs/
-│       ├── monthly_trend.csv
-│       ├── holiday_vs_nonholiday.csv
-│       ├── holiday_breakdown_by_date.csv
-│       └── year_over_year.csv
-│
-├── excel/
-│   └── Walmart_Forecast.xlsx
-│
-├── dashboard/
-│   ├── walmart_sales_dashboard.pbix
-│   └── images/
-│       └── dashboard_screenshot.png
-```
-
-Full SQL scripts and the Excel/Power BI files are included above for anyone who wants to verify or extend the analysis. The sections below summarize the approach and results; they're not a full step-by-step log.
-
+ 
+## Executive Summary
+ 
+**The business question.** What will total company-wide weekly sales look like over the next 3 months, and how much of that pattern is driven by holiday periods? This question guided every stage of the project — from the SQL analysis used to understand historical patterns, to the choice of forecasting method, to the KPIs featured on the final dashboard.
+ 
+**Trade-offs and assumptions.** The dataset covers only 2.7 years of history — enough to confirm December/January seasonality twice, but limited for rarer or longer-cycle patterns. The dataset's `holiday_flag` for Christmas is mislabeled (Dec 31 instead of the pre-Christmas period), which limits its reliability as a standalone seasonality signal and was corrected for by breaking the holiday average apart by individual date. The forecast is company-wide and does not account for the large performance variation between individual stores.
+ 
+**Key insights.** Sales show a strong, consistent seasonal pattern — but only for December and January. December peaked at $288.76M (2010) and $288.08M (2011), nearly identical and dramatically above every other month both years, while January was consistently the lowest month immediately after. The "holiday" effect is real but concentrated almost entirely in Thanksgiving week — averaged across all flagged holidays, the lift was only 7.8%, but breaking it down by individual date showed Thanksgiving alone spikes ~40%, while Super Bowl and Labor Day are only marginally above baseline. The forecast correctly reproduced the seasonal pattern with moderate accuracy: December 2012 was forecasted at $293.75M via Excel, closely matching real December 2010/2011 totals and cross-validated by an independent Power BI forecast, with backtesting producing a 14.4% MAPE.
+ 
+**Three actionable recommendations.**
+1. **Target Thanksgiving week specifically, not "holidays" broadly**, for promotional and staffing planning — it's the single strongest short-term driver identified, while other flagged holidays show only a marginal lift.
+2. **Plan inventory and staffing for the December surge and the January drop-off** — the pattern is historically 40–50% above baseline in December, then falls sharply immediately after.
+3. **Treat forecasts for non-seasonal, mid-year months with more caution, and consider extending the analysis to the store level** — backtesting showed weaker accuracy outside the Dec/Jan season, and the current forecast is company-wide, which may mask meaningful differences between locations.
 ---
 
 ## Dashboard
@@ -185,10 +151,11 @@ order by
 	month,year;
 ```
 
-### 3. Forecasting (Two independent methods, for comparison)
-- **Excel**: `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval
+### 3. Forecasting (two independent methods, for comparison)
+- **Excel:** [Walmart_Forecast.xlsx](excel/Walmart_Forecast.xlsx) — `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval.
 
-- **Power BI**: built-in forecast visual (Analytics pane), same 3-month horizon and seasonality setting, for cross-validation against the Excel result.
+- **Power BI:** [walmart_sales_dashboard.pbix](dashboard/walmart_sales_dashboard.pbix) — built-in forecast visual (Analytics pane), same 3-month horizon and seasonality setting, for cross-validation against the Excel result.
+
 
 ### 4. Accuracy Validation (Backtesting)
 - Held out the last 3 known months (Aug–Oct 2012) from the training data.
@@ -203,52 +170,49 @@ order by
 ---
 
 ## A Closer Look: The Holiday Finding
+This was the sharpest insight in the project. Averaging all holiday weeks together gave a modest 7.8% lift — too small to explain the ~50% December spike seen in the monthly trend. Breaking the average back apart by individual holiday date revealed why: Thanksgiving week alone averages ~$1.46M–$1.48M (a ~40% spike), while Super Bowl and Labor Day are only marginally above the $1.04M non-holiday baseline — and the flagged "Christmas" date (Dec 31) is actually below average, since it lands after the real shopping rush. See sql/04_holiday_breakdown_by_date.sql for the full script and sql/03_holiday_vs_nonholiday.sql for the initial blended comparison.
 
-This was the sharpest insight in the project, so it's worth showing the actual query behind it rather than just the conclusion.
+---
 
-Averaging all holiday weeks together gave a modest 7.8% lift — too small to explain the ~50% December spike seen in the monthly trend. Breaking the average back apart by individual holiday date revealed why:
+## Data Source & License
 
-```sql
-SELECT
-    sale_date,
-    AVG(weekly_sales) AS avg_sales
-FROM weekly_sales
-WHERE holiday_flag = true
-GROUP BY sale_date
-ORDER BY sale_date;
+**Dataset**: Walmart Weekly Sales (2010–2012)
+**Source**: [Kaggle — Walmart Dataset](https://www.kaggle.com/datasets/yasserh/walmart-dataset)
+**License**: CC0: Public Domain
+**Size**: 6,435 rows, 45 stores, weekly sales from February 2010 to November 2012 (~2.7 years)
+
+**Columns**: Store, Date, Weekly_Sales, Holiday_Flag, Temperature, Fuel_Price, CPI, Unemployment
+
+---
+
+## Repository Structure
+
+```
+end-to-end-sales-forecasting-analysis/
+│
+├── README.md
+│
+├── dataset/
+│   └── Walmart.csv
+│
+├── sql/
+│   ├── Walmart_Sales_Forecast_Trend_Seasonality_and_Holiday_Impact.sql
+│   └── outputs/
+│       ├── monthly_trend.csv
+│       ├── holiday_vs_nonholiday.csv
+│       ├── holiday_breakdown_by_date.csv
+│       └── year_over_year.csv
+│
+├── excel/
+│   └── Walmart_Forecast.xlsx
+│
+├── dashboard/
+│   ├── walmart_sales_dashboard.pbix
+│   └── images/
+│       └── dashboard_screenshot.png
 ```
 
-This showed Thanksgiving week averaging ~$1.46M–$1.48M (a ~40% spike), while Super Bowl and Labor Day were only marginally above the $1.04M non-holiday baseline — and the flagged "Christmas" date (Dec 31) was actually *below* average, since it lands after the real shopping rush. See `sql/04_holiday_breakdown_by_date.sql` for the full script and `sql/03_holiday_vs_nonholiday.sql` for the initial blended comparison.
-
----
-
-## Key Findings
-
-**1. Sales show a strong, consistent seasonal pattern — but only for December and January.**
-December peaked at $288.76M (2010) and $288.08M (2011) — nearly identical, and dramatically above every other month both years. January was consistently the lowest month immediately after ($163.70M in 2011, $168.89M in 2012). Other mid-year months fluctuated without a consistent year-over-year direction, so they weren't treated as seasonal.
-
-**2. The "holiday" effect is real but concentrated almost entirely in Thanksgiving week.**
-Averaged across all flagged holidays, the lift was only 7.8% ($1,122,888 vs. $1,041,256 per week). Breaking this down by individual holiday showed why: Thanksgiving week alone shows a ~40% spike, while Super Bowl and Labor Day are only marginally above average. The dataset's "Christmas" flag is placed on December 31st — after the shopping rush — so it doesn't capture the real holiday surge, and the blended average understates Thanksgiving's true impact.
-
-**3. The forecast correctly reproduced the seasonal pattern, with moderate accuracy.**
-December 2012 was forecasted at $293.75M (95% CI: $253.6M–$333.9M) via Excel, closely matching real December 2010/2011 totals. Power BI's independent forecast produced a similar peak (~$290M), cross-validating the result across two tools. Backtesting on 3 held-out months produced a MAPE of 14.4% — accuracy was weaker specifically on non-seasonal mid-year months.
-
----
-
-## Recommendations
-
-- Plan inventory and staffing for a substantial December surge (historically 40–50% above baseline months) and a corresponding January drop-off.
-- Target Thanksgiving week specifically — not "holidays" broadly — for promotional and staffing planning, as it's the single strongest short-term driver identified.
-- Treat forecasts for non-seasonal (mid-year) months with more caution, given the higher error rate observed there during backtesting.
-- Consider extending this analysis to the store level in future work, since the current forecast is company-wide and may mask meaningful differences in performance across locations.
-
----
-
-## Limitations
-
-- Only 2.7 years of history — enough to confirm December/January seasonality twice, but limited for rarer or longer-cycle patterns.
-- The dataset's `holiday_flag` for Christmas is mislabeled (Dec 31 instead of the pre-Christmas period), limiting its reliability as a standalone seasonality signal.
-- The forecast is company-wide and does not account for the large performance variation between individual stores.
+Full SQL scripts and the Excel/Power BI files are included above for anyone who wants to verify or extend the analysis. The sections below summarize the approach and results; they're not a full step-by-step log.
 
 ---
 
