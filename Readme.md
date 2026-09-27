@@ -152,7 +152,7 @@ order by
 ```
 
 ### 3. Forecasting (two independent methods, for comparison)
-- **Excel:** [Walmart_Forecast.xlsx](excel/Walmart_Forecast.xlsx) — `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval.
+- **Excel:** [Walmart_Forecast.xlsx](excel/walmart_forecast.xlsx) — `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval.
 
 - **Power BI:** [walmart_sales_dashboard.pbix](dashboard/walmart_sales_dashboard.pbix) — built-in forecast visual (Analytics pane), same 3-month horizon and seasonality setting, for cross-validation against the Excel result.
 
