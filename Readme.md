@@ -65,16 +65,69 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 ### 1. Data Loading & Cleaning (SQL)
 - Loaded raw CSV into PostgreSQL, converting mixed date formats (`DD-MM-YYYY` with inconsistent separators) into proper `DATE` types.
 ```sql
-SELECT Region, Category,
-       COUNT(*) AS orders,
-       ROUND(AVG(CASE WHEN Returned='Yes' THEN 1.0 ELSE 0 END)*100, 1) AS return_rate_pct,
-       ROUND(AVG(CustomerSatisfaction), 1) AS avg_satisfaction
-FROM retail_sales
-GROUP BY Region, Category
-ORDER BY return_rate_pct DESC;
+create table weekly_sales_raw(
+	store INT,
+    sale_date_text VARCHAR(20),
+    weekly_sales NUMERIC(12,2),
+    holiday_flag INT,
+    temperature NUMERIC(5,2),
+    fuel_price NUMERIC(5,3),
+    cpi NUMERIC(10,4),
+    unemployment NUMERIC(5,2)
+);
+
+CREATE TABLE weekly_sales AS
+SELECT
+    store,
+    TO_DATE(sale_date_text, 'DD-MM-YYYY') AS sale_date,
+    weekly_sales,
+    holiday_flag::BOOLEAN,
+    temperature,
+    fuel_price,
+    cpi,
+    unemployment
+FROM weekly_sales_raw;
 ```
 - Added a composite primary key (`store`, `sale_date`) to enforce uniqueness.
+
+```sql
+-- Add the composite key back (store + date together must be unique)
+alter table weekly_sales
+add primary key (store,sale_date);
+
+-- Each store should only have one row per week
+select store,sale_date,count(*)
+from weekly_sales
+group by store,sale_date
+having count(*) > 1;
+```
 - Verified data quality: zero missing values, zero impossible values (negative sales, out-of-range percentages), and confirmed all 45 stores had complete, even history (143 weeks each).
+
+```sql
+-- Check 1: Missing values
+SELECT
+    COUNT(*) FILTER (WHERE store IS NULL) AS missing_store,
+    COUNT(*) FILTER (WHERE sale_date IS NULL) AS missing_date,
+    COUNT(*) FILTER (WHERE weekly_sales IS NULL) AS missing_sales,
+    COUNT(*) FILTER (WHERE holiday_flag IS NULL) AS missing_holiday_flag,
+    COUNT(*) FILTER (WHERE temperature IS NULL) AS missing_temp,
+    COUNT(*) FILTER (WHERE fuel_price IS NULL) AS missing_fuel,
+    COUNT(*) FILTER (WHERE cpi IS NULL) AS missing_cpi,
+    COUNT(*) FILTER (WHERE unemployment IS NULL) AS missing_unemployment
+FROM weekly_sales;
+
+-- Check 2: Negative or impossible values
+SELECT * FROM weekly_sales WHERE weekly_sales <= 0;
+SELECT * FROM weekly_sales WHERE fuel_price <= 0;
+SELECT * FROM weekly_sales WHERE unemployment < 0 OR unemployment > 30;
+SELECT * FROM weekly_sales WHERE temperature < -30 OR temperature > 120;  -- extreme outlier bounds, not "negative = bad"
+SELECT * FROM weekly_sales WHERE cpi <= 0;
+
+-- Check 3: Row count per store
+select store,count(*) as weeks_recorded
+from weekly_sales
+group by store;
+```
 
 ### 2. Exploratory & Business-Question SQL Analysis
 - Calculated monthly sales trends across the full time range.
