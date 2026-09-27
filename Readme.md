@@ -131,10 +131,59 @@ group by store;
 
 ### 2. Exploratory & Business-Question SQL Analysis
 - Calculated monthly sales trends across the full time range.
+
+```sql
+-- How has total company-wide revenue changed month by month?
+-- Is there a repeating pattern across the year?
+select
+	date_trunc('month',sale_date) as month,
+	sum(weekly_sales) as total_sales
+from weekly_sales
+group by date_trunc('month',sale_date)
+order by month;
+```
 - Compared average sales on holiday vs. non-holiday weeks.
+
+```sql
+-- Are sales actually higher on the specific weeks marked as holidays, compared to regular weeks?
+-- and if so, by how much?
+select
+	holiday_flag,
+	avg(weekly_sales) as avg_weekly_sales,
+	count(*) as num_weeks
+from weekly_sales
+group by holiday_flag;
+```
 - Broke down sales by individual holiday date to identify which specific holidays drive the effect.
+
+```sql
+-- The overall 'holiday effect' was only 8%
+-- Is that because every holiday adds a small bump?
+-- Or because one big holiday is doing most of the work and the rest add almost nothing?
+select 
+	sale_date,
+	avg(weekly_sales)
+from weekly_sales
+where holiday_flag = 'true'
+group by sale_date
+order by sale_date;
+```
 - Ran a year-over-year comparison to confirm which monthly patterns are genuinely seasonal (repeat every year) vs. noise (don't repeat consistently).
-- Identified top 5 and bottom 5 performing stores by average weekly sales.
+
+```sql
+-- Does the same monthly pattern (December high, January low) repeat consistently every year?
+-- Or could 2010's pattern have been a one-time fluke?
+select
+	extract (year from sale_date) as year,
+	extract (month from sale_date) as month,
+	sum(weekly_sales) as total_sales
+from weekly_sales
+group by 
+	extract (year from sale_date),
+	extract (month from sale_date)
+order by
+	month,year;
+```
 
 ### 3. Forecasting (Two independent methods, for comparison)
 - **Excel**: `FORECAST.ETS()` with explicit 12-month seasonality, plus `FORECAST.ETS.CONFINT()` for a 95% confidence interval
