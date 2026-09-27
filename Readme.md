@@ -64,6 +64,15 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 
 ### 1. Data Loading & Cleaning (SQL)
 - Loaded raw CSV into PostgreSQL, converting mixed date formats (`DD-MM-YYYY` with inconsistent separators) into proper `DATE` types.
+```sql
+SELECT Region, Category,
+       COUNT(*) AS orders,
+       ROUND(AVG(CASE WHEN Returned='Yes' THEN 1.0 ELSE 0 END)*100, 1) AS return_rate_pct,
+       ROUND(AVG(CustomerSatisfaction), 1) AS avg_satisfaction
+FROM retail_sales
+GROUP BY Region, Category
+ORDER BY return_rate_pct DESC;
+```
 - Added a composite primary key (`store`, `sale_date`) to enforce uniqueness.
 - Verified data quality: zero missing values, zero impossible values (negative sales, out-of-range percentages), and confirmed all 45 stores had complete, even history (143 weeks each).
 
