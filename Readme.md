@@ -10,7 +10,10 @@
  
 **The business question.** What will total company-wide weekly sales look like over the next 3 months, and how much of that pattern is driven by holiday periods? This question guided every stage of the project — from the SQL analysis used to understand historical patterns, to the choice of forecasting method, to the KPIs featured on the final dashboard.
  
-**Trade-offs and assumptions.** The dataset covers only 2.7 years of history — enough to confirm December/January seasonality twice, but limited for rarer or longer-cycle patterns. The dataset's `holiday_flag` for Christmas is mislabeled (Dec 31 instead of the pre-Christmas period), which limits its reliability as a standalone seasonality signal and was corrected for by breaking the holiday average apart by individual date. The forecast is company-wide and does not account for the large performance variation between individual stores.
+**Trade-offs and assumptions.** 
+- The dataset covers only 2.7 years of history — enough to confirm December/January seasonality twice, but limited for rarer or longer-cycle patterns.
+- The dataset's `holiday_flag` for Christmas is mislabeled (Dec 31 instead of the pre-Christmas period), which limits its reliability as a standalone seasonality signal and was corrected for by breaking the holiday average apart by individual date.
+- The forecast is company-wide and does not account for the large performance variation between individual stores.
  
 **Key insights.** 
 - Sales show a strong, consistent seasonal pattern — but only for December and January. December peaked at $288.76M (2010) and $288.08M (2011), nearly identical and dramatically above every other month both years, while January was consistently the lowest month immediately after. 
