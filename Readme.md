@@ -224,7 +224,9 @@ Full SQL scripts and the Excel/Power BI files are included above for anyone who 
 
 ## Tools Used
 
-SQL (PostgreSQL) · Excel ( FORECAST.ETS(), FORECAST.ETS.CONFINT() ) · Power BI (DAX measures, forecast visuals, dashboard design)
+- SQL (PostgreSQL) 
+- Excel ( FORECAST.ETS(), FORECAST.ETS.CONFINT() ) 
+- Power BI (DAX measures, forecast visuals, dashboard design)
 
 ---
 
